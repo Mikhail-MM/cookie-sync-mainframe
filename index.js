@@ -30,7 +30,8 @@ app.use('/', (req, res, next) => {
 
 app.get('/sync', (req, res, next) => {
 	console.log("Mainframe Receives Sync Request")
-	console.log("logging req.body: ", req.body)
+	console.log("logging full request",  req)
+	console.log("Logging headers: ", req.headers)
 		res.status(200).send('Syncing Requisites')
 });
 
