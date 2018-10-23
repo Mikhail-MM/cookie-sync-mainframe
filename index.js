@@ -20,6 +20,7 @@ app.use('/', (req, res, next) => {
 	console.log("Logging Forwarded-For Client IP ", req.headers["x-forwarded-for"])
 	console.log("Logging Proxy IP ", req.ip)
 	console.log("LOGGING COOKIES: ", req.cookies)
+	// Problem: This will never stop sending a UUID - the request is bounced from partner 1, and the only cookie it should ever have is from partner 1. This will be a control via headers
 	if (!req.cookies['mainframe_tracking_id']) {
 		console.log('Piped Request To Mainframe Does Not Have UUID.')
 		const uniqueID = uuidv4();
@@ -30,7 +31,7 @@ app.use('/', (req, res, next) => {
 
 app.get('/sync', (req, res, next) => {
 	console.log("Mainframe Receives Sync Request")
-	console.log("logging full request",  req)
+	//console.log("logging full request",  req)
 	console.log("Logging headers: ", req.headers)
 		res.status(200).send('Syncing Requisites')
 });
