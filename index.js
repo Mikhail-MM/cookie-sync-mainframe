@@ -25,7 +25,7 @@ app.use('/', (req, res, next) => {
 	if (!req.cookies['mainframe_tracking_id']) {
 		console.log('Piped Request To Mainframe Does Not Have UUID.')
 		const uniqueID = uuidv4();
-		res.setHeader('Set-Cookie', [`mainframe_tracking_id=${uniqueID}`]);
+		res.setHeader('Set-Cookie', [`mainframe_tracking_id=${uniqueID}; domain=https://cookie-sync-mainframe.herokuapp.com`]);
 	}
 	next();
 });
