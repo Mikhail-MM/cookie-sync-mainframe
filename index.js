@@ -22,10 +22,11 @@ app.use('/', (req, res, next) => {
 	console.log("LOGGING COOKIES: ", req.cookies)
 	console.log(" ")
 	// Problem: This will never stop sending a UUID - the request is bounced from partner 1, and the only cookie it should ever have is from partner 1. This will be a control via headers
+	// This does not work - we can't set cookies for this domain from an indirect piped request. Spoofing the domain just gets it ignored by the useragent
 	if (!req.cookies['mainframe_tracking_id']) {
 		console.log('Piped Request To Mainframe Does Not Have UUID.')
 		const uniqueID = uuidv4();
-		res.setHeader('Set-Cookie', [`mainframe_tracking_id=${uniqueID}; domain=https://cookie-sync-mainframe.herokuapp.com`]);
+		res.setHeader('Set-Cookie', [`mainframe_tracking_id=${uniqueID}`]);
 	}
 	next();
 });
