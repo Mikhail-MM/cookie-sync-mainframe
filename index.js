@@ -50,6 +50,7 @@ app.get('/sync', async (req, res, next) => {
 		console.log(req.headers['x-audience-tracking-id'])
 		console.log(req.headers['x-partner-1-tracking-id'])
 		console.log(req.headers['x-mainframe-tracking-id'])
+		console.log(req.headers['x-original-ip'])
 		console.log(true && req.headers['x-mainframe-tracking-id'])
 
 			const updatedClient = await Client.findOneAndUpdate(
