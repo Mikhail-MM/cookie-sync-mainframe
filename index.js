@@ -93,17 +93,17 @@ app.get('/adworks', async (req, res, next) => {
 
 		const clientMatch = await Client.findOne({
 			$or: [{	
-				ipRange: req.headers['x-original-ip'],	
 				audienceTrackingID: req.headers['x-audience-tracking-id'],
 				partner1TrackingID: req.headers['x-partner-1-tracking-id'],
-				mainframeTrackingID: req.headers['x-mainframe-tracking-id'],
 			}]
 		})
-
+		console.log(clientMatch)
 		const tryThis = await Client.findOne({partner1TrackingID: req.headers['x-partner-1-tracking-id']})
+		const ipMatch = await Client.findOne({ipRange: req.headers['x-original-ip']})
 		console.log(tryThis)
+		console.log(ipMatch)
 		console.log('QUERY COMPLETE')
-		const { contentFocus } = clientMatch
+		const { contentFocus } = tryThis
 		console.log("Sending Content Focus: ", contentFocus)
 			res.sendFile(path.join(__dirname + `/${contentFocus}.jpg`))
 	} catch(err) { next(err) }
