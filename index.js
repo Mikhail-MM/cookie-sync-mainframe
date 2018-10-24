@@ -2,7 +2,24 @@ const express = require('express');
 const path = require('path');
 const uuidv4 = require('uuid/v4');
 const cookieParser = require('cookie-parser')
-const serveStatic = require('serve-static')
+
+const mongoose = require('mongoose');
+const mongoDBuri = `mongodb://${process.env.MLABS_USER}:${process.env.MLABS_PW}@ds137581.mlab.com:37581/cookie-sync-mainframe` 
+
+mongoose.Promise = global.Promise; 
+mongoose.connect(mongoDBuri, { useNewUrlParser: true });
+
+const Schema = mongoose.Schema;
+
+const ClientSchema = new Schema({
+	ipRange: [String],
+	audienceTrackingID: String,
+	partner1TrackingID: String,
+	mainframeTrackingID: String,
+	contentFocus: String,
+});
+
+const Client = mongoose.model('Client', ClientSchema);
 
 const app = express();
 
@@ -38,6 +55,10 @@ app.get('/sync', (req, res, next) => {
 	console.log("Logging headers: ", req.headers)
 		res.status(200).send('Syncing Requisites')
 });
+
+app.get('/adworks', (req, res, next) => {
+	res.sendFile(path.join(__dirname + '/Weddings.jpg'))
+})
 
 app.get('*', (req, res) => {
 	console.log("Catch-All Handler")
