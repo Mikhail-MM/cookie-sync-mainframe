@@ -96,7 +96,7 @@ app.get('/adworks', async (req, res, next) => {
 				{ ipRange: req.headers['x-original-ip'] || '' },	
 				{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
 				{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || ''},
-			}]
+			]
 		})
 		console.log(clientMatch)
 		const tryThis = await Client.findOne({partner1TrackingID: req.headers['x-partner-1-tracking-id']})
