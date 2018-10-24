@@ -87,7 +87,7 @@ app.get('/prebid', async (req, res, next) => {
 			const uniqueID = uuidv4();
 			res.setHeader('Set-Cookie', [`mainframe_tracking_id=${uniqueID}`]);
 		}
-		const bid1 = await rp('http://localhost:2555/bidding')
+		const bid1 = await rp('https://cookie-sync-partner-2.herokuapp.com/bidding')
 		const bid2 = await rp('https://cookie-sync-partner-1.herokuapp.com/bidding')
 		res.json({
 			bid1,
@@ -110,7 +110,7 @@ app.get('/timed-prebid', async (req, res, next) => {
 			}
 		})
 		.catch(err => console.log(err))
-	const bid1 = rp('http://localhost:2555/bidding')
+	const bid1 = rp('https://cookie-sync-partner-2/bidding')
 		.then(res => {
 			if(!biddingComplete) {
 				biddingComplete = true;
