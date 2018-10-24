@@ -52,6 +52,7 @@ app.get('/sync', async (req, res, next) => {
 		console.log(req.headers['x-mainframe-tracking-id'])
 		console.log(req.headers['x-original-ip'])
 		console.log(true && req.headers['x-mainframe-tracking-id'])
+		console.log(typeof(req.headers['x-mainframe-tracking-id']))
 
 			const updatedClient = await Client.findOneAndUpdate(
 			{ 	$or: [{
@@ -83,27 +84,29 @@ app.get('/sync', async (req, res, next) => {
 });
 
 app.get('/adworks', async (req, res, next) => {
-	console.log("Query Headers:")
-			console.log(req.headers['x-audience-tracking-id'])
-			console.log(req.headers['x-partner-1-tracking-id'])
-			console.log(req.headers['x-mainframe-tracking-id'])
-			console.log("QUERYING:")
+	try {
+		console.log("Query Headers:")
+				console.log(req.headers['x-audience-tracking-id'])
+				console.log(req.headers['x-partner-1-tracking-id'])
+				console.log(req.headers['x-mainframe-tracking-id'])
+				console.log("QUERYING:")
 
-	const clientMatch = await Client.findOne({
-		$or: [{	
-			ipRange: { $elemMatch: { $eq: req.headers['x-original-ip'] } },	
-			audienceTrackingID: req.headers['x-audience-tracking-id'],
-			partner1TrackingID: req.headers['x-partner-1-tracking-id'],
-			mainframeTrackingID: req.headers['x-mainframe-tracking-id'],
-		}]
-	})
+		const clientMatch = await Client.findOne({
+			$or: [{	
+				ipRange: { $elemMatch: { $eq: req.headers['x-original-ip'] } },	
+				audienceTrackingID: req.headers['x-audience-tracking-id'],
+				partner1TrackingID: req.headers['x-partner-1-tracking-id'],
+				mainframeTrackingID: req.headers['x-mainframe-tracking-id'],
+			}]
+		})
 
-	const tryThis = await Client.findOne({partner1TrackingID: req.headers['x-partner-1-tracking-id']})
-	console.log(tryThis)
-	console.log('QUERY COMPLETE')
-	const { contentFocus } = clientMatch
-	console.log("Sending Content Focus: ", contentFocus)
-		res.sendFile(path.join(__dirname + `/${contentFocus}.jpg`))
+		const tryThis = await Client.findOne({partner1TrackingID: req.headers['x-partner-1-tracking-id']})
+		console.log(tryThis)
+		console.log('QUERY COMPLETE')
+		const { contentFocus } = clientMatch
+		console.log("Sending Content Focus: ", contentFocus)
+			res.sendFile(path.join(__dirname + `/${contentFocus}.jpg`))
+	} catch(err) { next(err) }
 })
 
 app.get('*', (req, res) => {
