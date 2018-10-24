@@ -56,7 +56,7 @@ app.get('/sync', async (req, res, next) => {
 			const updatedClient = await Client.findOneAndUpdate(
 			{ 	$or: [{
 					
-					ipRange: req.headers['x-original-ip'],
+					ipRange: { $elemMatch: { $eq: req.headers['x-original-ip'] } },
 					
 					audienceTrackingID: req.headers['x-audience-tracking-id'],
 					partner1TrackingID: req.headers['x-partner-1-tracking-id'],
@@ -64,6 +64,9 @@ app.get('/sync', async (req, res, next) => {
 				
 				}]
 			}, {
+				
+				$addToSet: { ipRange: req.headers['x-original-ip'] },
+				
 				audienceTrackingID: req.headers['x-audience-tracking-id'],
 				partner1TrackingID: req.headers['x-partner-1-tracking-id'],
 				mainframeTrackingID: req.headers['x-mainframe-tracking-id'],
