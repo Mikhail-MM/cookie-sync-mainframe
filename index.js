@@ -43,7 +43,8 @@ app.use('/', (req, res, next) => {
 app.get('/sync', async (req, res, next) => {
 	try {
 			const updatedClient = await Client.findOneAndUpdate(
-			{ 	$or: [{ ipRange: { $elemMatch: { $eq: req.headers['x-original-ip'] || '' } },
+			{ 	$or: [
+					{ ipRange: { $elemMatch: { $eq: req.headers['x-original-ip'] || '' } } },
 					{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
 					{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || '' },
 					{ mainframeTrackingID: req.headers['x-mainframe-tracking-id'] || '' }]
