@@ -82,8 +82,18 @@ app.get('/sync', async (req, res, next) => {
 	} catch(err) { next(err) }
 });
 
-app.get('/adworks', (req, res, next) => {
-	res.sendFile(path.join(__dirname + '/Weddings.jpg'))
+app.get('/adworks', async (req, res, next) => {
+	const clientMatch = await Client.findOne({
+		$or: [{	
+			ipRange: { $elemMatch: { $eq: req.headers['x-original-ip'] } },	
+			audienceTrackingID: req.headers['x-audience-tracking-id'],
+			partner1TrackingID: req.headers['x-partner-1-tracking-id'],
+			mainframeTrackingID: req.headers['x-mainframe-tracking-id'],
+		}]
+	})
+	const { contentFocus } = clientMatch
+	console.log("Sending Content Focus: ", contentFocus)
+		res.sendFile(path.join(__dirname + `/${contentFocus}.jpg`))
 })
 
 app.get('*', (req, res) => {
