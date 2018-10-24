@@ -102,7 +102,7 @@ app.get('/timed-prebid', async (req, res, next) => {
 		res.setHeader('Set-Cookie', [`mainframe_tracking_id=${uniqueID}`]);
 	}
 	let biddingComplete;
-	const bid2 = rp('http://cookie-sync-partner-1/bidding')
+	const bid2 = rp('https://cookie-sync-partner-1.herokuapp.com/bidding')
 		.then(res => {
 			if(!biddingComplete) {
 				biddingComplete = true;
@@ -110,7 +110,7 @@ app.get('/timed-prebid', async (req, res, next) => {
 			}
 		})
 		.catch(err => console.log(err))
-	const bid1 = rp('https://cookie-sync-partner-2/bidding')
+	const bid1 = rp('https://cookie-sync-partner-2.herokuapp.com/bidding')
 		.then(res => {
 			if(!biddingComplete) {
 				biddingComplete = true;
