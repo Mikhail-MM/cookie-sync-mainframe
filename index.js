@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const uuidv4 = require('uuid/v4');
 const cookieParser = require('cookie-parser')
+const rp = require('request-promise')
 
 const mongoose = require('mongoose');
 const mongoDBuri = `mongodb://${process.env.MLABS_USER}:${process.env.MLABS_PW}@ds137581.mlab.com:37581/cookie-sync-mainframe` 
@@ -34,8 +35,6 @@ app.use('/*', function(req, res, next) {
 });
 
 app.use('/', (req, res, next) => {
-	console.log("Logging Forwarded-For Client IP ", req.headers["x-forwarded-for"])
-	console.log("Logging Proxy IP ", req.ip)
 	console.log("LOGGING COOKIES: ", req.cookies)
 	console.log(" ")
 	next();
@@ -43,27 +42,11 @@ app.use('/', (req, res, next) => {
 
 app.get('/sync', async (req, res, next) => {
 	try {
-		console.log("Mainframe Receives Sync Request")
-		console.log(" ")
-		//console.log("logging full request",  req)
-		console.log("Logging important headers:")
-		console.log(req.headers['x-audience-tracking-id'])
-		console.log(req.headers['x-partner-1-tracking-id'])
-		console.log(req.headers['x-mainframe-tracking-id'])
-		console.log(req.headers['x-original-ip'])
-		console.log(true && req.headers['x-mainframe-tracking-id'])  // undefined
-		console.log(typeof(req.headers['x-mainframe-tracking-id']))
-
 			const updatedClient = await Client.findOneAndUpdate(
-			{ 	$or: [{
-					
-					ipRange: { $elemMatch: { $eq: req.headers['x-original-ip'] } },
-					
-					audienceTrackingID: req.headers['x-audience-tracking-id'],
-					partner1TrackingID: req.headers['x-partner-1-tracking-id'],
-					mainframeTrackingID: req.headers['x-mainframe-tracking-id'],
-				
-				}]
+			{ 	$or: [{ ipRange: { $elemMatch: { $eq: req.headers['x-original-ip'] || '' } },
+					{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
+					{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || '' },
+					{ mainframeTrackingID: req.headers['x-mainframe-tracking-id'] || '' }]
 			}, {
 				
 				$addToSet: { ipRange: req.headers['x-original-ip'] },
@@ -85,12 +68,6 @@ app.get('/sync', async (req, res, next) => {
 
 app.get('/adworks', async (req, res, next) => {
 	try {
-		console.log("Query Headers:")
-				console.log(req.headers['x-audience-tracking-id'])
-				console.log(req.headers['x-partner-1-tracking-id'])
-				console.log(req.headers['x-mainframe-tracking-id'])
-				console.log("QUERYING:")
-
 		const clientMatch = await Client.findOne({
 			$or: [
 				{ ipRange: req.headers['x-original-ip'] || '' },	
@@ -98,16 +75,49 @@ app.get('/adworks', async (req, res, next) => {
 				{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || ''},
 			]
 		})
-		console.log(clientMatch)
-		const tryThis = await Client.findOne({partner1TrackingID: req.headers['x-partner-1-tracking-id']})
-		const ipMatch = await Client.findOne({ipRange: req.headers['x-original-ip']})
-		console.log(tryThis)
-		console.log(ipMatch)
-		console.log('QUERY COMPLETE')
 		const { contentFocus } = clientMatch
-		console.log("Sending Content Focus: ", contentFocus)
 			res.sendFile(path.join(__dirname + `/${contentFocus}.jpg`))
 	} catch(err) { next(err) }
+})
+
+app.get('/prebid', async (req, res, next) => {
+	try{
+		if (!req.cookies['mainframe_tracking_id']) {
+			const uniqueID = uuidv4();
+			res.setHeader('Set-Cookie', [`mainframe_tracking_id=${uniqueID}`]);
+		}
+		const bid1 = await rp('http://localhost:2555/bidding')
+		const bid2 = await rp('https://cookie-sync-partner-1.herokuapp.com/bidding')
+		res.json({
+			bid1,
+			bid2
+		})
+	} catch(err) { next(err) }
+})
+
+app.get('/timed-prebid', async (req, res, next) => {
+	if (!req.cookies['mainframe_tracking_id']) {
+		const uniqueID = uuidv4();
+		res.setHeader('Set-Cookie', [`mainframe_tracking_id=${uniqueID}`]);
+	}
+	let biddingComplete;
+	const bid2 = rp('http://cookie-sync-partner-1/bidding')
+		.then(res => {
+			if(!biddingComplete) {
+				biddingComplete = true;
+				console.log('Bid2 Fastest')
+			}
+		})
+		.catch(err => console.log(err))
+	const bid1 = rp('http://localhost:2555/bidding')
+		.then(res => {
+			if(!biddingComplete) {
+				biddingComplete = true;
+				console.log('Bid1 Fastest')
+			}
+		})
+		.catch(err => console.log(err))
+			res.send('OK')
 })
 
 app.get('*', (req, res) => {
