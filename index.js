@@ -94,7 +94,7 @@ app.get('/adworks', async (req, res, next) => {
 		const clientMatch = await Client.findOne({
 			$or: [{	
 				ipRange: req.headers['x-original-ip'],	
-				audienceTrackingID: req.headers['x-audience-tracking-id'],
+				// audienceTrackingID: req.headers['x-audience-tracking-id'],
 				partner1TrackingID: req.headers['x-partner-1-tracking-id'],
 			}]
 		})
