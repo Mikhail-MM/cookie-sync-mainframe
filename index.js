@@ -51,7 +51,7 @@ app.get('/sync', async (req, res, next) => {
 		console.log(req.headers['x-partner-1-tracking-id'])
 		console.log(req.headers['x-mainframe-tracking-id'])
 		console.log(req.headers['x-original-ip'])
-		console.log(true && req.headers['x-mainframe-tracking-id'])
+		console.log(true && req.headers['x-mainframe-tracking-id'])  // undefined
 		console.log(typeof(req.headers['x-mainframe-tracking-id']))
 
 			const updatedClient = await Client.findOneAndUpdate(
@@ -92,10 +92,10 @@ app.get('/adworks', async (req, res, next) => {
 				console.log("QUERYING:")
 
 		const clientMatch = await Client.findOne({
-			$or: [{	
-				ipRange: req.headers['x-original-ip'],	
-				// audienceTrackingID: req.headers['x-audience-tracking-id'],
-				partner1TrackingID: req.headers['x-partner-1-tracking-id'],
+			$or: [
+				{ ipRange: req.headers['x-original-ip'] || '' },	
+				{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
+				{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || ''},
 			}]
 		})
 		console.log(clientMatch)
@@ -104,7 +104,7 @@ app.get('/adworks', async (req, res, next) => {
 		console.log(tryThis)
 		console.log(ipMatch)
 		console.log('QUERY COMPLETE')
-		const { contentFocus } = tryThis
+		const { contentFocus } = clientMatch
 		console.log("Sending Content Focus: ", contentFocus)
 			res.sendFile(path.join(__dirname + `/${contentFocus}.jpg`))
 	} catch(err) { next(err) }
