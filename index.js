@@ -84,10 +84,11 @@ app.get('/sync', async (req, res, next) => {
 
 app.get('/adworks', async (req, res, next) => {
 	console.log("Query Headers:")
-	console.log(req.headers['x-audience-tracking-id'])
+			console.log(req.headers['x-audience-tracking-id'])
 			console.log(req.headers['x-partner-1-tracking-id'])
 			console.log(req.headers['x-mainframe-tracking-id'])
 			console.log("QUERYING:")
+
 	const clientMatch = await Client.findOne({
 		$or: [{	
 			ipRange: { $elemMatch: { $eq: req.headers['x-original-ip'] } },	
@@ -96,6 +97,9 @@ app.get('/adworks', async (req, res, next) => {
 			mainframeTrackingID: req.headers['x-mainframe-tracking-id'],
 		}]
 	})
+
+	const tryThis = await Client.findOne({partner1TrackingID: req.headers['x-partner-1-tracking-id']})
+	console.log(tryThis)
 	console.log('QUERY COMPLETE')
 	const { contentFocus } = clientMatch
 	console.log("Sending Content Focus: ", contentFocus)
