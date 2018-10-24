@@ -12,7 +12,7 @@ mongoose.connect(mongoDBuri, { useNewUrlParser: true });
 const Schema = mongoose.Schema;
 
 const ClientSchema = new Schema({
-	ipRange: [String],
+	ipRange: [],
 	audienceTrackingID: String,
 	partner1TrackingID: String,
 	mainframeTrackingID: String,
@@ -50,6 +50,7 @@ app.get('/sync', async (req, res, next) => {
 		console.log(req.headers['x-audience-tracking-id'])
 		console.log(req.headers['x-partner-1-tracking-id'])
 		console.log(req.headers['x-mainframe-tracking-id'])
+		console.log(true && req.headers['x-mainframe-tracking-id'])
 
 			const updatedClient = await Client.findOneAndUpdate(
 			{ 	$or: [{
