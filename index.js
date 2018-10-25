@@ -46,6 +46,7 @@ app.get('/partner-sync', async (req, res, next) => {
 	if (req.headers['x-audience-tracking-id']) updateObject.audienceTrackingID = req.headers['x-audience-tracking-id'];
 	if (req.headers['x-partner-1-tracking-id']) updateObject.partner1TrackingID = req.headers['x-partner-1-tracking-id'];
 	if (req.headers['x-mainframe-tracking-id']) updateObject.mainFrameTrackingID = req.headers['x-mainframe-tracking-id'];
+	if (req.headers['x-contentfocus']) updateObject.contentFocus = req.headers['x-contentfocus'];
 	try {
 			const updatedClient = await Client.findOneAndUpdate(
 			{ 	$or: [
