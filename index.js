@@ -79,7 +79,7 @@ app.get('/adworks', async (req, res, next) => {
 		console.log("Generating Dynamic Retargetted Ad")
 		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
 		console.log(partner1Query)
-		const clientMatch = await Client.find({partner1TrackingID: partner1Query})
+		const clientMatch = await Client.findOne({partner1TrackingID: partner1Query})
 		console.log(clientMatch)
 		console.log(clientMatch.contentFocus)
 			if (clientMatch && clientMatch.contentFocus) {
