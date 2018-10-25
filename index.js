@@ -3,6 +3,7 @@ const path = require('path');
 const uuidv4 = require('uuid/v4');
 const cookieParser = require('cookie-parser')
 const rp = require('request-promise')
+const request = require('request')
 
 const mongoose = require('mongoose');
 const mongoDBuri = `mongodb://${process.env.MLABS_USER}:${process.env.MLABS_PW}@ds137581.mlab.com:37581/cookie-sync-mainframe` 
@@ -59,7 +60,7 @@ app.get('/sync', async (req, res, next) => {
 
 			}, { new: true, upsert: true })
 
-			console.log("Did we get dis client doe?")
+			console.log("Did Client Update?")
 			console.log(updatedClient)
 
 			res.status(200).json(updatedClient)
@@ -71,13 +72,16 @@ app.get('/adworks', async (req, res, next) => {
 	try {
 		const clientMatch = await Client.findOne({
 			$or: [
-				{ ipRange: req.headers['x-original-ip'] || '' },	
+				// { ipRange: req.headers['x-original-ip'] || '' },	
 				{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
-				{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || ''},
+				{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || '' },
 			]
 		})
-		const { contentFocus } = clientMatch
-			res.sendFile(path.join(__dirname + `/${contentFocus}.jpg`))
+			if (clientMatch) {
+				res.sendFile(path.join(__dirname + `/${contentFocus}.jpg`))
+			} else {
+				res.sendFile(path.join(__dirname + `/Unknown.jpg`))
+			}
 	} catch(err) { next(err) }
 })
 
@@ -87,24 +91,46 @@ app.get('/prebid', async (req, res, next) => {
 			const uniqueID = uuidv4();
 			res.setHeader('Set-Cookie', [`mainframe_tracking_id=${uniqueID}`]);
 		}
-		const bid1 = await rp('https://cookie-sync-partner-2.herokuapp.com/bidding')
-		const bid2 = await rp('https://cookie-sync-partner-1.herokuapp.com/bidding')
-		res.json({
-			bid1,
-			bid2
+		const bids = await Promise.all([rp('https://cookie-sync-partner-2.herokuapp.com/bidding'), rp('https://cookie-sync-partner-1.herokuapp.com/bidding')])
+		const clientMatch = await Client.findOne({
+			$or: [
+				// { ipRange: req.headers['x-original-ip'] || '' },	
+				{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
+				{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || ''},
+			]
 		})
+		const winningBid = bids.reduce((a, b) => Math.max(a.bid, b.bid));
+		const { origin, bid } = winningBid;
+			if (clientMatch) {
+				request(`${origin}/partnerAd/${clientMatch.contentFocus}.jpg`).pipe(res)
+			} else {
+				request(`${origin}/partnerAd/Unknown.jpg`).pipe(res)
+			}
 	} catch(err) { next(err) }
 })
 
-app.get('/timed-prebid', (req, res, next) => {
-	Promise.race([
-		rp('https://cookie-sync-partner-1.herokuapp.com/bidding'), 
-		rp('https://cookie-sync-partner-2.herokuapp.com/bidding')]
-	).then(response => {
-		res.send(response)
-	}).catch(err => {
-		next(err)
-	})
+app.get('/timed-prebid', async (req, res, next) => {
+	try {
+		Promise.race([
+			rp('https://cookie-sync-partner-1.herokuapp.com/bidding'), 
+			rp('https://cookie-sync-partner-2.herokuapp.com/bidding')]
+		).then(response => {
+			const clientMatch = await Client.findOne({
+				$or: [
+					// { ipRange: req.headers['x-original-ip'] || '' },	
+					{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
+					{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || ''},
+				]
+			})
+			if (clientMatch) {
+				request(`${response.origin}/partnerAd/${clientMatch.contentFocus}.jpg`).pipe(res)
+			} else {
+				request(`${response.origin}/partnerAd/Unknown.jpg`).pipe(res)
+			}
+		}).catch(err => {
+			next(err)
+		})
+	} catch(err) { next(err) }
 })
 
 app.get('*', (req, res) => {
