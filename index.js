@@ -100,6 +100,8 @@ app.get('/prebid', async (req, res, next) => {
 			]
 		})
 		console.log(bids)
+		console.log(bids[0].bid)
+		console.log(Math.max(bids[0].bid, bids[1].bid))
 		const winningBid = bids.reduce((a, b) => Math.max(a.bid, b.bid));
 		console.log(winningBid)
 		const { origin, bid } = winningBid;
@@ -117,6 +119,8 @@ app.get('/timed-prebid', async (req, res, next) => {
 			rp('https://cookie-sync-partner-1.herokuapp.com/bidding'), 
 			rp('https://cookie-sync-partner-2.herokuapp.com/bidding')]
 		)
+		console.log(fastBid)
+		console.log(fastBid.origin)
 		const clientMatch = await Client.findOne({
 			$or: [
 				// { ipRange: req.headers['x-original-ip'] || '' },	
