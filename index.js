@@ -42,6 +42,12 @@ app.use('/', (req, res, next) => {
 });
 
 app.get('/partner-sync', async (req, res, next) => {
+	let updateObject = {
+		$addToSet: { ipRange: req.headers['x-original-ip'] },
+	};
+	if (req.headers['x-audience-tracking-id']) updateObject.audienceTrackingID = req.headers['x-audience-tracking-id'];
+	if (req.headers['x-partner-1-tracking-id']) updateObject.partner1TrackingID = req.headers['x-partner-1-tracking-id'];
+	if (req.headers['x-mainframe-tracking-id']) updateObject.mainFrameTrackingID = req.headers['x-mainframe-tracking-id'];
 	try {
 			const updatedClient = await Client.findOneAndUpdate(
 			{ 	$or: [
@@ -49,16 +55,7 @@ app.get('/partner-sync', async (req, res, next) => {
 					{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
 					{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || '' },
 					{ mainframeTrackingID: req.headers['x-mainframe-tracking-id'] || '' }]
-			}, {
-				
-				$addToSet: { ipRange: req.headers['x-original-ip'] },
-				
-				audienceTrackingID: req.headers['x-audience-tracking-id'],
-				partner1TrackingID: req.headers['x-partner-1-tracking-id'],
-				mainframeTrackingID: req.headers['x-mainframe-tracking-id'],
-				contentFocus: req.headers['x-contentfocus'],
-
-			}, { new: true, upsert: true })
+			}, { updateObject }, { new: true, upsert: true })
 
 			console.log("Did Client Update?")
 			console.log(updatedClient)
