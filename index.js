@@ -35,6 +35,10 @@ app.use('/*', function(req, res, next) {
   next();
 });
 
+app.use('/*', async (req, res, next) => {
+
+})
+
 app.use('/', (req, res, next) => {
 	console.log("LOGGING COOKIES: ", req.cookies)
 	console.log(" ")
@@ -47,6 +51,7 @@ app.get('/partner-sync', async (req, res, next) => {
 	if (req.headers['x-partner-1-tracking-id']) updateObject.partner1TrackingID = req.headers['x-partner-1-tracking-id'];
 	if (req.headers['x-mainframe-tracking-id']) updateObject.mainFrameTrackingID = req.headers['x-mainframe-tracking-id'];
 	if (req.headers['x-contentfocus']) updateObject.contentFocus = req.headers['x-contentfocus'];
+
 	try {
 			const updatedClient = await Client.findOneAndUpdate(
 			{ 	$or: [
@@ -69,7 +74,11 @@ app.get('/partner-sync', async (req, res, next) => {
 
 app.get('/mainframe-sync', async (req, res, next) => {
 	try {
-
+		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
+		const updatedClient = await Client.findOneAndUpdate({partner1TrackingID: partner1Query}, {mainframeTrackingID: req.headers['x-mainframe-tracking-id']}, {new: true})
+		console.log("Updated existing client")
+		console.log(updatedClient)
+			res.send('OK')
 	} catch(err) { next(err) }
 })
 
