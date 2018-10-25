@@ -41,7 +41,7 @@ app.use('/', (req, res, next) => {
 	next();
 });
 
-app.get('/sync', async (req, res, next) => {
+app.get('/partner-sync', async (req, res, next) => {
 	try {
 			const updatedClient = await Client.findOneAndUpdate(
 			{ 	$or: [
@@ -68,8 +68,16 @@ app.get('/sync', async (req, res, next) => {
 	} catch(err) { next(err) }
 });
 
+app.get('/mainframe-sync', async (req, res, next) => {
+	try {
+
+	} catch(err) { next(err) }
+})
+
 app.get('/adworks', async (req, res, next) => {
 	try {
+		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
+		console.log('Partner 1 Query: ', partner1Query)
 		const clientMatch = await Client.findOne({
 			$or: [
 				// { ipRange: req.headers['x-original-ip'] || '' },	
@@ -93,7 +101,7 @@ app.get('/prebid', async (req, res, next) => {
 		}
 		const bids = await Promise.all([rp('https://cookie-sync-partner-2.herokuapp.com/bidding').json(), rp('https://cookie-sync-partner-1.herokuapp.com/bidding').json()])
 		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
-		console.log(partner1Query)
+		console.log('Partner 1 Query: ', partner1Query)
 		const clientMatch = await Client.findOne({
 			$or: [
 				// { ipRange: req.headers['x-original-ip'] || '' },	
@@ -106,7 +114,6 @@ app.get('/prebid', async (req, res, next) => {
 				return a
 			} else return b
 		});
-		console.log(winningBid)
 		const { origin, bid } = winningBid;
 			if (clientMatch) {
 				request(`${origin}/partnerAd/${clientMatch.contentFocus}.jpg`).pipe(res)
@@ -122,8 +129,6 @@ app.get('/timed-prebid', async (req, res, next) => {
 			rp('https://cookie-sync-partner-1.herokuapp.com/bidding').json(), 
 			rp('https://cookie-sync-partner-2.herokuapp.com/bidding').json()]
 		)
-		console.log(fastBid)
-		console.log(fastBid)
 		const clientMatch = await Client.findOne({
 			$or: [
 				// { ipRange: req.headers['x-original-ip'] || '' },	
