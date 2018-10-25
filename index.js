@@ -107,7 +107,7 @@ app.get('/prebid', async (req, res, next) => {
 	try{
 		const bids = await Promise.all([rp('https://cookie-sync-partner-2.herokuapp.com/bidding').json(), rp('https://cookie-sync-partner-1.herokuapp.com/bidding').json()])
 		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
-		const clientMatch = await Client.findOne({mainframeTrackingID: req.query['x-mainframe-tracking-id']})
+		const clientMatch = await Client.findOne({mainframeTrackingID: req.query['mainframe-tracking-id']})
 		console.log(clientMatch)
 		const winningBid = bids.reduce((a, b) => {
 			if (a.bid > b.bid) {
@@ -134,7 +134,8 @@ app.get('/timed-prebid', async (req, res, next) => {
 			rp('https://cookie-sync-partner-1.herokuapp.com/bidding').json(), 
 			rp('https://cookie-sync-partner-2.herokuapp.com/bidding').json()]
 		)
-		const clientMatch = await Client.findOne({mainframeTrackingID: req.query['x-mainframe-tracking-id']})
+		console.log("LOOKING FOR THE QUERY:", req.query['x-mainframe-tracking-id'])
+		const clientMatch = await Client.findOne({mainframeTrackingID: req.query['mainframe-tracking-id']})
 
 			if (clientMatch && clientMatch.contentFocus) {
 				request(`${fastBid.origin}/partnerAd/${clientMatch.contentFocus}.jpg`).pipe(res)
