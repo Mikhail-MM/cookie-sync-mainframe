@@ -76,6 +76,8 @@ app.get('/mainframe-sync', async (req, res, next) => {
 		console.log('Partner 1 Query:' partner1Query)
 		console.log('ReqHeaders Mainframe Tracking ID: ', req.headers['x-mainframe-tracking-id'])
 		const updatedClient = await Client.findOneAndUpdate({partner1TrackingID: partner1Query}, {mainframeTrackingID: req.headers['x-mainframe-tracking-id']}, {new: true})
+		const WTF = await Client.findOne({partner1TrackingID: partner1Query})
+		console.log("WTF:", WTF)
 		console.log("Updated existing client")
 		console.log(updatedClient)
 			res.send('OK')
