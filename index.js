@@ -109,7 +109,8 @@ app.get('/prebid', async (req, res, next) => {
 		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
 		console.log('Partner 1 Query: ', partner1Query)
 		const clientMatch = await Client.find({mainframeTrackingID: req.cookies['x-mainframe-tracking-id']})
-
+		console.log("PREBID RESULT:", clientMatch)
+		console.log("WE GOT A FOCUS:", clientMatch.contentFocus)
 		console.log(clientMatch)
 		const winningBid = bids.reduce((a, b) => {
 			if (a.bid > b.bid) {
@@ -117,6 +118,7 @@ app.get('/prebid', async (req, res, next) => {
 			} else return b
 		});
 		const { origin, bid } = winningBid;
+		
 			if (clientMatch && clientMatch.contentFocus) {
 				request(`${origin}/partnerAd/${clientMatch.contentFocus}.jpg`).pipe(res)
 			} else {
