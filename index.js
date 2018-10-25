@@ -104,7 +104,7 @@ app.get('/prebid', async (req, res, next) => {
 		console.log('Partner 1 Query: ', partner1Query)
 		const clientMatch = await Client.findOne({
 			$or: [
-				// { ipRange: req.headers['x-original-ip'] || '' },	
+				{ ipRange: req.headers['x-original-ip'] || '' },	
 				{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
 				{ partner1TrackingID: partner1Query || ''},
 			]
