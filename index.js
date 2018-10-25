@@ -35,10 +35,6 @@ app.use('/*', function(req, res, next) {
   next();
 });
 
-app.use('/*', async (req, res, next) => {
-
-})
-
 app.use('/', (req, res, next) => {
 	console.log("LOGGING COOKIES: ", req.cookies)
 	console.log(" ")
