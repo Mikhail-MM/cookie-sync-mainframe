@@ -96,29 +96,15 @@ app.get('/prebid', async (req, res, next) => {
 	} catch(err) { next(err) }
 })
 
-app.get('/timed-prebid', async (req, res, next) => {
-	if (!req.cookies['mainframe_tracking_id']) {
-		const uniqueID = uuidv4();
-		res.setHeader('Set-Cookie', [`mainframe_tracking_id=${uniqueID}`]);
-	}
-	let biddingComplete;
-	const bid2 = rp('https://cookie-sync-partner-1.herokuapp.com/bidding')
-		.then(res => {
-			if(!biddingComplete) {
-				biddingComplete = true;
-				console.log('Bid2 Fastest')
-			}
-		})
-		.catch(err => console.log(err))
-	const bid1 = rp('https://cookie-sync-partner-2.herokuapp.com/bidding')
-		.then(res => {
-			if(!biddingComplete) {
-				biddingComplete = true;
-				console.log('Bid1 Fastest')
-			}
-		})
-		.catch(err => console.log(err))
-			res.send('OK')
+app.get('/timed-prebid', (req, res, next) => {
+	Promise.race([
+		rp('https://cookie-sync-partner-1.herokuapp.com/bidding'), 
+		rp('https://cookie-sync-partner-2.herokuapp.com/bidding')]
+	).then(response => {
+		res.send(response)
+	}).catch(err => {
+		next(err)
+	})
 })
 
 app.get('*', (req, res) => {
