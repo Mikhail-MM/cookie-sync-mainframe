@@ -92,11 +92,12 @@ app.get('/prebid', async (req, res, next) => {
 			res.setHeader('Set-Cookie', [`mainframe_tracking_id=${uniqueID}`]);
 		}
 		const bids = await Promise.all([rp('https://cookie-sync-partner-2.herokuapp.com/bidding').json(), rp('https://cookie-sync-partner-1.herokuapp.com/bidding').json()])
+		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
 		const clientMatch = await Client.findOne({
 			$or: [
 				// { ipRange: req.headers['x-original-ip'] || '' },	
 				{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
-				{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || ''},
+				{ partner1TrackingID: partner1Query || ''},
 			]
 		})
 		const winningBid = bids.reduce((a, b) => {
