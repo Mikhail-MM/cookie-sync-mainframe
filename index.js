@@ -125,9 +125,9 @@ app.get('/timed-prebid', async (req, res, next) => {
 			]
 		})
 			if (clientMatch) {
-				request(`${response.origin}/partnerAd/${clientMatch.contentFocus}.jpg`).pipe(res)
+				request(`${fastBid.origin}/partnerAd/${clientMatch.contentFocus}.jpg`).pipe(res)
 			} else {
-				request(`${response.origin}/partnerAd/Unknown.jpg`).pipe(res)
+				request(`${fastBid.origin}/partnerAd/Unknown.jpg`).pipe(res)
 			}
 	} catch(err) { next(err) }
 })
