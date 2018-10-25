@@ -92,7 +92,6 @@ app.get('/adworks', async (req, res, next) => {
 		console.log(partner1Query)
 		const clientMatch = await Client.findOne({partner1TrackingID: partner1Query})
 		console.log(clientMatch)
-		console.log(clientMatch.contentFocus)
 			if (clientMatch && clientMatch.contentFocus) {
 				res.sendFile(path.join(__dirname + `/${clientMatch.contentFocus}.jpg`))
 			} else {
