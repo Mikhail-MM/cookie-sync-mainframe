@@ -78,6 +78,8 @@ app.get('/adworks', async (req, res, next) => {
 		console.log("Generating Dynamic Retargetted Ad")
 		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
 		console.log('Partner 1 Query: ', partner1Query)
+		console.log(req.headers['x-audience-tracking-id'])
+		console.log(partner1TrackingID: req.headers['x-partner-1-tracking-id'])
 		const clientMatch = await Client.findOne({
 			$or: [
 				// { ipRange: req.headers['x-original-ip'] || '' },	
