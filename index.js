@@ -78,7 +78,7 @@ app.get('/adworks', async (req, res, next) => {
 			]
 		})
 			if (clientMatch) {
-				res.sendFile(path.join(__dirname + `/${contentFocus}.jpg`))
+				res.sendFile(path.join(__dirname + `/${clientMatch.contentFocus}.jpg`))
 			} else {
 				res.sendFile(path.join(__dirname + `/Unknown.jpg`))
 			}
@@ -93,6 +93,7 @@ app.get('/prebid', async (req, res, next) => {
 		}
 		const bids = await Promise.all([rp('https://cookie-sync-partner-2.herokuapp.com/bidding').json(), rp('https://cookie-sync-partner-1.herokuapp.com/bidding').json()])
 		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
+		console.log(partner1Query)
 		const clientMatch = await Client.findOne({
 			$or: [
 				// { ipRange: req.headers['x-original-ip'] || '' },	
