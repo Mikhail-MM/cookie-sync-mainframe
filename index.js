@@ -71,7 +71,10 @@ app.get('/partner-sync', async (req, res, next) => {
 
 app.get('/mainframe-sync', async (req, res, next) => {
 	try {
+		console.log("Syncing on Mainframe")
 		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
+		console.log('Partner 1 Query:' partner1Query)
+		console.log('ReqHeaders Mainframe Tracking ID: ', req.headers['x-mainframe-tracking-id'])
 		const updatedClient = await Client.findOneAndUpdate({partner1TrackingID: partner1Query}, {mainframeTrackingID: req.headers['x-mainframe-tracking-id']}, {new: true})
 		console.log("Updated existing client")
 		console.log(updatedClient)
