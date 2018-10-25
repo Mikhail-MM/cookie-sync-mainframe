@@ -108,17 +108,9 @@ app.get('/prebid', async (req, res, next) => {
 		const bids = await Promise.all([rp('https://cookie-sync-partner-2.herokuapp.com/bidding').json(), rp('https://cookie-sync-partner-1.herokuapp.com/bidding').json()])
 		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
 		console.log('Partner 1 Query: ', partner1Query)
+		const clientMatch = await Client.find({mainframeTrackingID: req.cookies['x-mainframe-tracking-id']})
 
-		const clientMatch = await Client.findOne({
-			$or: [
-				{ ipRange: req.headers['x-original-ip'] || '' },	
-				{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
-				{ partner1TrackingID: partner1Query || ''},
-			]
-		})
-		const tryThis = await Client.find({partner1TrackingID: partner1Query})
 		console.log(clientMatch)
-		console.log("try This: ", tryThis)
 		const winningBid = bids.reduce((a, b) => {
 			if (a.bid > b.bid) {
 				return a
