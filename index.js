@@ -55,7 +55,7 @@ app.get('/partner-sync', async (req, res, next) => {
 					{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
 					{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || '' },
 					{ mainframeTrackingID: req.headers['x-mainframe-tracking-id'] || '' }]
-			}, { updateObject }, { new: true, upsert: true })
+			}, { $set: updateObject }, { new: true, upsert: true })
 
 			console.log("Did Client Update?")
 			console.log(updatedClient)
