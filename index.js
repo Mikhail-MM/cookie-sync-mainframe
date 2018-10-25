@@ -46,6 +46,7 @@ app.use('/', (req, res, next) => {
 });
 
 app.get('/partner-sync', async (req, res, next) => {
+	console.log("Partner sync request")
 	let updateObject = {};
 	if (req.headers['x-audience-tracking-id']) updateObject.audienceTrackingID = req.headers['x-audience-tracking-id'];
 	if (req.headers['x-partner-1-tracking-id']) updateObject.partner1TrackingID = req.headers['x-partner-1-tracking-id'];
