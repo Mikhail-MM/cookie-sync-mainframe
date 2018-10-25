@@ -135,6 +135,11 @@ app.get('/timed-prebid', async (req, res, next) => {
 		)
 		console.log("LOOKING FOR THE QUERY:", req.query['x-mainframe-tracking-id'])
 		const clientMatch = await Client.findOne({mainframeTrackingID: req.query['mainframe-tracking-id']})
+		console.log(clientMatch.contentFocus)
+		console.log(clientMatch.contentFocus && true)
+		console.log(typeof(clientMatch.contentFocus))
+		console.log(clientMatch.contentFocus == null)
+		console.log(clientMatch.contentFocus === null)
 
 			if (clientMatch && clientMatch.contentFocus) {
 				request(`${fastBid.origin}/partnerAd/${clientMatch.contentFocus}.jpg`).pipe(res)
