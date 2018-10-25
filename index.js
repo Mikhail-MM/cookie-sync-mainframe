@@ -78,19 +78,7 @@ app.get('/adworks', async (req, res, next) => {
 	try {
 		console.log("Generating Dynamic Retargetted Ad")
 		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
-		console.log('Partner 1 Query: ', partner1Query)
-		console.log(req.headers['x-audience-tracking-id'])
-		console.log(req.headers['x-partner-1-tracking-id'])
-		const clientMatch = await Client.findOne({
-			$or: [
-				// { ipRange: req.headers['x-original-ip'] || '' },	
-				{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
-				{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || '' },
-			]
-		})
-		const tryThis = await Client.find({partner1TrackingID: partner1Query})
-		console.log(clientMatch)
-		console.log("try This: ", tryThis)
+		const clientMatch = await Client.find({partner1TrackingID: partner1Query})
 			if (clientMatch && clientMatch.contentFocus) {
 				res.sendFile(path.join(__dirname + `/${clientMatch.contentFocus}.jpg`))
 			} else {
