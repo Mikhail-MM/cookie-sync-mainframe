@@ -91,14 +91,10 @@ app.get('/adworks', async (req, res, next) => {
 })
 
 // We can't send the ad request directly to the mainframe sync without dropping in a dummy script to identify this machine. Need to implement mainframe sync method
-/*
+
 app.get('/prebid', async (req, res, next) => {
 	try{
-		if (!req.cookies['mainframe_tracking_id']) {
-			const uniqueID = uuidv4();
-			res.setHeader('Set-Cookie', [`mainframe_tracking_id=${uniqueID}`]);
-		}
-		const bids = await Promise.all([req.pipe(rp('https://cookie-sync-partner-2.herokuapp.com/bidding')).json(), req.pipe(rp('https://cookie-sync-partner-1.herokuapp.com/bidding')).json()])
+		const bids = await Promise.all([rp('https://cookie-sync-partner-2.herokuapp.com/bidding').json(), rp('https://cookie-sync-partner-1.herokuapp.com/bidding').json()])
 		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
 		console.log('Partner 1 Query: ', partner1Query)
 
@@ -126,6 +122,7 @@ app.get('/prebid', async (req, res, next) => {
 	} catch(err) { next(err) }
 })
 
+/*
 app.get('/timed-prebid', async (req, res, next) => {
 	try {
 		console.log("Fast Prebid")
