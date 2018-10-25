@@ -107,10 +107,7 @@ app.get('/prebid', async (req, res, next) => {
 	try{
 		const bids = await Promise.all([rp('https://cookie-sync-partner-2.herokuapp.com/bidding').json(), rp('https://cookie-sync-partner-1.herokuapp.com/bidding').json()])
 		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
-		console.log('Partner 1 Query: ', partner1Query)
-		const clientMatch = await Client.find({mainframeTrackingID: req.cookies['x-mainframe-tracking-id']})
-		console.log("PREBID RESULT:", clientMatch)
-		console.log("WE GOT A FOCUS:", clientMatch.contentFocus)
+		const clientMatch = await Client.findOne({mainframeTrackingID: req.query['x-mainframe-tracking-id']})
 		console.log(clientMatch)
 		const winningBid = bids.reduce((a, b) => {
 			if (a.bid > b.bid) {
@@ -118,7 +115,7 @@ app.get('/prebid', async (req, res, next) => {
 			} else return b
 		});
 		const { origin, bid } = winningBid;
-		
+
 			if (clientMatch && clientMatch.contentFocus) {
 				request(`${origin}/partnerAd/${clientMatch.contentFocus}.jpg`).pipe(res)
 			} else {
@@ -127,7 +124,7 @@ app.get('/prebid', async (req, res, next) => {
 	} catch(err) { next(err) }
 })
 
-/*
+
 app.get('/timed-prebid', async (req, res, next) => {
 	try {
 		console.log("Fast Prebid")
@@ -137,16 +134,8 @@ app.get('/timed-prebid', async (req, res, next) => {
 			rp('https://cookie-sync-partner-1.herokuapp.com/bidding').json(), 
 			rp('https://cookie-sync-partner-2.herokuapp.com/bidding').json()]
 		)
-		const clientMatch = await Client.findOne({
-			$or: [
-				// { ipRange: req.headers['x-original-ip'] || '' },	
-				{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
-				{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || ''},
-			]
-		})
-		const tryThis = await Client.find({partner1TrackingID: partner1Query})
-		console.log(clientMatch)
-		console.log("try This: ", tryThis)
+		const clientMatch = const clientMatch = await Client.findOne({mainframeTrackingID: req.query['x-mainframe-tracking-id']})
+
 			if (clientMatch && clientMatch.contentFocus) {
 				request(`${fastBid.origin}/partnerAd/${clientMatch.contentFocus}.jpg`).pipe(res)
 			} else {
@@ -155,7 +144,7 @@ app.get('/timed-prebid', async (req, res, next) => {
 	} catch(err) { next(err) }
 })
 
-*/
+
 app.get('*', (req, res) => {
 	console.log("Catch-All Handler")
 	res.status(200).send("All Clear Chief.")
