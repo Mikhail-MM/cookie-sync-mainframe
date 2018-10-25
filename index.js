@@ -91,7 +91,7 @@ app.get('/prebid', async (req, res, next) => {
 			const uniqueID = uuidv4();
 			res.setHeader('Set-Cookie', [`mainframe_tracking_id=${uniqueID}`]);
 		}
-		const bids = await Promise.all([rp('https://cookie-sync-partner-2.herokuapp.com/bidding'), rp('https://cookie-sync-partner-1.herokuapp.com/bidding')])
+		const bids = await Promise.all([rp('https://cookie-sync-partner-2.herokuapp.com/bidding').json(), rp('https://cookie-sync-partner-1.herokuapp.com/bidding').json()])
 		const clientMatch = await Client.findOne({
 			$or: [
 				// { ipRange: req.headers['x-original-ip'] || '' },	
@@ -116,11 +116,11 @@ app.get('/prebid', async (req, res, next) => {
 app.get('/timed-prebid', async (req, res, next) => {
 	try {
 		const fastBid = await Promise.race([
-			rp('https://cookie-sync-partner-1.herokuapp.com/bidding'), 
-			rp('https://cookie-sync-partner-2.herokuapp.com/bidding')]
+			rp('https://cookie-sync-partner-1.herokuapp.com/bidding').json(), 
+			rp('https://cookie-sync-partner-2.herokuapp.com/bidding').json()]
 		)
 		console.log(fastBid)
-		console.log(fastBid.origin)
+		console.log(fastBid)
 		const clientMatch = await Client.findOne({
 			$or: [
 				// { ipRange: req.headers['x-original-ip'] || '' },	
