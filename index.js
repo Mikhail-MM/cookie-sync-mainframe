@@ -111,22 +111,25 @@ app.get('/prebid', async (req, res, next) => {
 
 app.get('/timed-prebid', async (req, res, next) => {
 	try {
+		// Can be awaited
 		Promise.race([
 			rp('https://cookie-sync-partner-1.herokuapp.com/bidding'), 
 			rp('https://cookie-sync-partner-2.herokuapp.com/bidding')]
-		).then(response => {
-			const clientMatch = await Client.findOne({
-				$or: [
-					// { ipRange: req.headers['x-original-ip'] || '' },	
-					{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
-					{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || ''},
-				]
-			})
-			if (clientMatch) {
-				request(`${response.origin}/partnerAd/${clientMatch.contentFocus}.jpg`).pipe(res)
-			} else {
-				request(`${response.origin}/partnerAd/Unknown.jpg`).pipe(res)
-			}
+		).then(async (response) => {
+			try {
+				const clientMatch = await Client.findOne({
+					$or: [
+						// { ipRange: req.headers['x-original-ip'] || '' },	
+						{ audienceTrackingID: req.headers['x-audience-tracking-id'] || '' },
+						{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || ''},
+					]
+				})
+				if (clientMatch) {
+					request(`${response.origin}/partnerAd/${clientMatch.contentFocus}.jpg`).pipe(res)
+				} else {
+					request(`${response.origin}/partnerAd/Unknown.jpg`).pipe(res)
+				}
+			} catch(err) { next(err) }
 		}).catch(err => {
 			next(err)
 		})
