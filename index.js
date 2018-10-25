@@ -99,7 +99,9 @@ app.get('/prebid', async (req, res, next) => {
 				{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || ''},
 			]
 		})
+		console.log(bids)
 		const winningBid = bids.reduce((a, b) => Math.max(a.bid, b.bid));
+		console.log(winningBid)
 		const { origin, bid } = winningBid;
 			if (clientMatch) {
 				request(`${origin}/partnerAd/${clientMatch.contentFocus}.jpg`).pipe(res)
