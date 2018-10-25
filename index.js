@@ -74,8 +74,10 @@ app.get('/mainframe-sync', async (req, res, next) => {
 	} catch(err) { next(err) }
 })
 
+
 app.get('/adworks', async (req, res, next) => {
 	try {
+		console.log("Generating Dynamic Retargetted Ad")
 		const partner1Query =  req.headers['x-partner-1-tracking-id'] || req.cookies['partner_1_tracking_id']
 		console.log('Partner 1 Query: ', partner1Query)
 		const clientMatch = await Client.findOne({
@@ -96,6 +98,8 @@ app.get('/adworks', async (req, res, next) => {
 	} catch(err) { next(err) }
 })
 
+// We can't send the ad request directly to the mainframe sync without dropping in a dummy script to identify this machine. Need to implement mainframe sync method
+/*
 app.get('/prebid', async (req, res, next) => {
 	try{
 		if (!req.cookies['mainframe_tracking_id']) {
@@ -157,6 +161,7 @@ app.get('/timed-prebid', async (req, res, next) => {
 	} catch(err) { next(err) }
 })
 
+*/
 app.get('*', (req, res) => {
 	console.log("Catch-All Handler")
 	res.status(200).send("All Clear Chief.")
