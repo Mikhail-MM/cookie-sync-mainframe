@@ -99,10 +99,11 @@ app.get('/prebid', async (req, res, next) => {
 				{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || ''},
 			]
 		})
-		console.log(bids)
-		console.log(bids[0].bid)
-		console.log(Math.max(bids[0].bid, bids[1].bid))
-		const winningBid = bids.reduce((a, b) => Math.max(a.bid, b.bid));
+		const winningBid = bids.reduce((a, b) => {
+			if (a.bid > b.bid) {
+				return a
+			} else return b
+		});
 		console.log(winningBid)
 		const { origin, bid } = winningBid;
 			if (clientMatch) {
