@@ -98,6 +98,7 @@ app.get('/adworks', async (req, res, next) => {
 
 app.get('/prebid', async (req, res, next) => {
 	try{
+		console.log("prebid")
 		if (!req.cookies['mainframe_tracking_id']) {
 			const uniqueID = uuidv4();
 			res.setHeader('Set-Cookie', [`mainframe_tracking_id=${uniqueID}`]);
@@ -132,6 +133,7 @@ app.get('/prebid', async (req, res, next) => {
 
 app.get('/timed-prebid', async (req, res, next) => {
 	try {
+		console.log("Fast Prebid")
 		const fastBid = await Promise.race([
 			rp('https://cookie-sync-partner-1.herokuapp.com/bidding').json(), 
 			rp('https://cookie-sync-partner-2.herokuapp.com/bidding').json()]
@@ -143,7 +145,10 @@ app.get('/timed-prebid', async (req, res, next) => {
 				{ partner1TrackingID: req.headers['x-partner-1-tracking-id'] || ''},
 			]
 		})
-			if (clientMatch) {
+		const tryThis = await Client.find({partner1TrackingID: partner1Query})
+		console.log(clientMatch)
+		console.log("try This: ", tryThis)
+			if (clientMatch && clientMatch.contentFocus) {
 				request(`${fastBid.origin}/partnerAd/${clientMatch.contentFocus}.jpg`).pipe(res)
 			} else {
 				request(`${fastBid.origin}/partnerAd/Unknown.jpg`).pipe(res)
