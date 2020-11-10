@@ -6,7 +6,7 @@ const rp = require('request-promise')
 const request = require('request')
 
 const mongoose = require('mongoose');
-const mongoDBuri = `mongodb://${process.env.MLABS_USER}:${process.env.MLABS_PW}@ds137581.mlab.com:37581/cookie-sync-mainframe` 
+const mongoDBuri = `mongodb+srv://${process.env.MLABS_USER}:${process.env.MLABS_PW}@cookie-sync-mainframe.tsvse.mongodb.net/cookie-sync-mainframe?retryWrites=true&w=majority` 
 
 mongoose.Promise = global.Promise; 
 mongoose.connect(mongoDBuri, { useNewUrlParser: true });
