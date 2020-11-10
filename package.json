@@ -6,7 +6,7 @@
   "dependencies": {
     "cookie-parser": "^1.4.3",
     "express": "^4.16.4",
-    "mongoose": "^5.3.6",
+    "mongoose": "^5.7.5",
     "request": "^2.88.0",
     "request-promise": "^4.2.2",
     "uuid": "^3.3.2"
